@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>๕๐ ปี คปอ. เรียนรู้ประวัติผ่านเกม</title>
+
+<style>
+@font-face{font-family:'Charmonman';font-weight:700;font-style:normal;font-display:swap;src:url(assets/fonts/Charmonman-Bold.woff2) format('woff2')}
+@font-face{font-family:'Sarabun';font-weight:400;font-style:normal;font-display:swap;src:url(assets/fonts/Sarabun-Regular.woff2) format('woff2')}
+@font-face{font-family:'Sarabun';font-weight:700;font-style:normal;font-display:swap;src:url(assets/fonts/Sarabun-Bold.woff2) format('woff2')}
+@font-face{font-family:'Chakra Petch';font-weight:700;font-style:normal;font-display:swap;src:url(assets/fonts/ChakraPetch-Bold.woff2) format('woff2')}
+:root{--navy:#040914;--panel:#0d1c3d;--gold:#d4af37;--gold2:#fef08a;--red:#e24b4a;--ok:#34d399}
+*{box-sizing:border-box}[hidden]{display:none!important}
+html,body{margin:0;min-height:100%;background:radial-gradient(circle at 50% 0,#13296a,var(--navy) 70%);color:#fff;font-family:Sarabun,system-ui,sans-serif;line-height:1.6;font-kerning:normal;text-rendering:optimizeLegibility}
+.scr{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:max(16px,env(safe-area-inset-top)) 16px max(16px,env(safe-area-inset-bottom));text-align:center}
+button{font:inherit;cursor:pointer}button:focus-visible{outline:2px solid var(--gold2);outline-offset:2px}
+.btn{background:linear-gradient(#f5d76e,var(--gold));color:#1a1405;border:0;border-radius:999px;padding:14px 28px;font-weight:700;font-size:1.1rem;min-height:48px}
+.btn.alt{background:transparent;color:var(--gold2);border:1px solid var(--gold)}
+#logo{width:min(80vw,440px);max-height:56vh;object-fit:contain;height:auto;filter:drop-shadow(0 10px 28px rgba(212,175,55,.35))}
+#vid video{width:100%;max-width:1100px;max-height:78vh;background:#000;border-radius:12px}
+.msg{color:var(--gold2);margin:12px 0}
+.g{width:100%;max-width:720px}
+h2{margin:0 0 .35em;padding-top:.1em;color:var(--gold2);font-family:Charmonman,Sarabun,serif;font-weight:700;font-size:clamp(1.7rem,6vw,2.4rem);line-height:1.5;letter-spacing:0;word-spacing:.08em;text-wrap:balance;text-shadow:0 2px 14px rgba(212,175,55,.35)}p.s{margin:0 0 12px;color:#cbd5e1}
+.bar{height:10px;background:#1e293b;border-radius:99px;overflow:hidden;margin:6px 0 12px}
+#fill{height:100%;width:100%;background:var(--ok);transition:width .1s linear,background .3s}
+.hud{display:flex;justify-content:space-between;align-items:center;font-size:1.4rem;font-weight:700;font-family:'Chakra Petch',Sarabun,sans-serif;line-height:1.4}
+.tl{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;position:relative;margin:14px 0 4px;padding-top:14px}
+.tl:before{content:"";position:absolute;top:5px;left:2%;right:2%;border-top:3px solid var(--gold)}
+.slot{aspect-ratio:1;border:2px dashed #64748b;border-radius:10px;background:#0b1633;display:flex;align-items:center;justify-content:center;color:#64748b;font-weight:700;position:relative}
+.slot:before{content:"";position:absolute;top:-14px;left:50%;width:11px;height:11px;margin-left:-5px;border-radius:50%;background:var(--gold)}
+.slot img{width:100%;height:100%;object-fit:contain;border-radius:8px}
+.slot.ok{border:2px solid var(--ok)}.slot.bad{animation:sh .35s}
+@keyframes sh{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.ends{display:flex;justify-content:space-between;color:#94a3b8;font-size:.85rem;margin-bottom:12px}
+.pool{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:8px}
+.card{background:var(--panel);border:2px solid #334155;border-radius:10px;padding:6px;color:#fff;font-size:.72rem;line-height:1.2}
+.card img{width:100%;aspect-ratio:1;object-fit:contain;display:block;margin-bottom:4px;border-radius:6px;background:#0b1633}
+.card.sel{border-color:var(--gold2);box-shadow:0 0 0 2px var(--gold)}
+#ov{position:fixed;inset:0;background:rgba(4,9,20,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;z-index:9}
+#ov .big{font-size:4.5rem}#ov h2{font-size:clamp(2rem,7.5vw,2.7rem);margin-bottom:.25em}#ov p{max-width:440px;color:#e2e8f0;line-height:1.7}
+#cardimg{max-width:100%;max-height:78vh;border-radius:8px}
+#cv{width:min(92vw,66vh,600px);aspect-ratio:1;border:2px solid var(--gold);border-radius:12px;touch-action:none;background:#04140a;display:block;margin:0 auto 10px}
+html{-webkit-text-size-adjust:100%}
+.slot{padding:0;font:inherit;font-weight:700;font-size:1.2rem}
+#ov{overflow:auto}
+.top{position:sticky;top:0;z-index:5;background:rgba(4,9,20,.92);padding:6px 0 2px;margin-bottom:6px}
+.bombwrap{width:min(46vw,210px);margin:0 auto}.bombwrap svg{width:100%;height:auto;display:block;overflow:visible}
+.led{animation:led 1s steps(1) infinite}.hot .led{animation-duration:.25s}.hot{animation:jit .12s infinite}
+.safe #bt{fill:#34d399}.safe .led{fill:#34d399;animation:none}
+@keyframes led{50%{opacity:.15}}@keyframes jit{25%{transform:translate(1px,-1px)}75%{transform:translate(-1px,1px)}}
+#fx{position:fixed;inset:0;z-index:8;pointer-events:none;overflow:hidden}
+#fx .fl{position:absolute;left:50%;top:50%;width:40vmax;height:40vmax;margin:-20vmax 0 0 -20vmax;border-radius:50%;background:radial-gradient(circle,#fff 0,#ffd54a 25%,#ff6a00 48%,rgba(255,60,0,0) 70%);animation:fl 1s ease-out forwards}
+#fx .ring{position:absolute;left:50%;top:50%;width:20vmax;height:20vmax;margin:-10vmax 0 0 -10vmax;border:8px solid #ffd54a;border-radius:50%;animation:rg .9s ease-out forwards}
+#fx i{position:absolute;left:50%;top:50%;width:12px;height:12px;margin:-6px;border-radius:50%;background:#ffb300;animation:pt .95s ease-out forwards}
+@keyframes fl{0%{transform:scale(0);opacity:1}60%{opacity:1}100%{transform:scale(2.2);opacity:0}}
+@keyframes rg{0%{transform:scale(.2);opacity:1}100%{transform:scale(3.4);opacity:0}}
+@keyframes pt{to{transform:translate(var(--dx),var(--dy)) scale(.2);opacity:0}}
+.shake{animation:shk .5s}@keyframes shk{20%{transform:translate(-8px,6px)}40%{transform:translate(7px,-6px)}60%{transform:translate(-5px,4px)}80%{transform:translate(4px,-3px)}}
+@media (hover:hover){.btn:hover{filter:brightness(1.08)}.card:hover{border-color:var(--gold)}.slot:hover{border-color:var(--gold2)}}
+@media (min-width:900px){.g{max-width:880px}.card{font-size:.85rem}.tl{gap:12px}.bombwrap{width:260px}}
+@media (max-height:520px){.bombwrap{width:120px}h2{font-size:1.5rem}.scr{justify-content:flex-start}}
+#ovd{width:min(86vw,420px);margin:6px auto 10px}
+.d1{position:relative;width:100%;aspect-ratio:20/9;background:#0b1633;border:1px solid #334155;border-radius:12px;overflow:hidden}
+.d1 .dl{position:absolute;left:8%;right:8%;top:11%;border-top:3px solid var(--gold)}
+.d1 .ds,.d1 .dc,.d1 .fly{position:absolute;aspect-ratio:1;border-radius:8px;box-sizing:border-box}
+.d1 .ds{top:15%;width:17%;border:2px dashed #64748b;background:#0b1633}
+.d1 .ds.t{animation:dslot 5s infinite}
+.d1 .dc{top:60%;width:17%;background:var(--panel);border:2px solid #334155;padding:2px}
+.d1 .dc.a{animation:dsel 5s infinite}
+.d1 .fly{top:60%;left:41.5%;width:17%;opacity:0;animation:dfly 5s infinite}
+.d1 img{width:100%;height:100%;object-fit:contain;display:block}
+.d1 .dh{position:absolute;font-size:1.7rem;line-height:1;opacity:0;animation:dhand 5s infinite}
+.dcap{margin-top:8px;font-weight:700;color:#cbd5e1}.dcap span,.dcap b{display:block}
+.dcap .c1{animation:cap1 5s infinite}.dcap .c2{animation:cap2 5s infinite}
+.d2{width:100%;height:auto;display:block}
+@keyframes dsel{0%,20%{border-color:#334155;box-shadow:none;opacity:1}25%,58%{border-color:#fef08a;box-shadow:0 0 0 2px #d4af37;opacity:1}62%,92%{border-color:#334155;box-shadow:none;opacity:.3}100%{opacity:1}}
+@keyframes dfly{0%,60%{opacity:0;left:41.5%;top:60%}61%{opacity:1;left:41.5%;top:60%}72%,92%{opacity:1;left:10%;top:15%}100%{opacity:0;left:10%;top:15%}}
+@keyframes dslot{0%,70%{border:2px dashed #64748b}72%,92%{border:2px solid #34d399}100%{border:2px dashed #64748b}}
+@keyframes dhand{0%{left:30%;top:92%;opacity:0;transform:scale(1)}8%{left:48%;top:78%;opacity:1}22%{transform:scale(1)}25%{transform:scale(.8)}30%{transform:scale(1);left:48%;top:78%}55%{left:16%;top:34%}60%{transform:scale(1);left:16%;top:34%}62%{transform:scale(.8)}66%{transform:scale(1)}92%{left:16%;top:34%;opacity:1}100%{left:16%;top:34%;opacity:0}}
+@keyframes cap1{0%,50%{opacity:1;color:#fef08a}55%,100%{opacity:.45;color:#cbd5e1}}
+@keyframes cap2{0%,50%{opacity:.45;color:#cbd5e1}55%,92%{opacity:1;color:#fef08a}100%{opacity:.45}}
+.cbox{position:relative;display:inline-block;max-width:100%;isolation:isolate}
+.cbox:before{content:"";position:absolute;inset:-9%;z-index:-1;border-radius:24px;background:radial-gradient(circle,rgba(255,215,90,.6),rgba(212,175,55,0) 66%);opacity:0}
+.cbox.go:before{animation:glow 3.4s ease-in-out 1s infinite}
+.cbox.go #cardimg{animation:cin 1.7s cubic-bezier(.2,.8,.2,1) both}
+.cbox.go ~ .btn{animation:fin .8s ease 1.5s both}
+.sp{position:absolute;inset:0;pointer-events:none}
+.sp i{display:block;position:absolute;left:var(--x);top:var(--y);width:var(--s);height:var(--s);margin:calc(var(--s)/-2);background:radial-gradient(circle,#fff 0,#ffe27a 45%,#f5b700 100%);clip-path:polygon(50% 0,60% 40%,100% 50%,60% 60%,50% 100%,40% 60%,0 50%,40% 40%);opacity:0;animation:tw var(--d) ease-in-out var(--dl) infinite}
+.shw{position:absolute;inset:0;overflow:hidden;border-radius:8px}
+.sh{position:absolute;top:-10%;bottom:-10%;width:35%;left:-45%;background:linear-gradient(100deg,rgba(255,255,255,0),rgba(255,236,150,.55),rgba(255,255,255,0));transform:skewX(-14deg);animation:sw 1.5s ease-in-out 1.5s both}
+@keyframes cin{0%{opacity:0;transform:translateY(30px) scale(.94);filter:blur(6px) brightness(1.7)}60%{filter:blur(0) brightness(1.2)}100%{opacity:1;transform:none;filter:none}}
+@keyframes glow{0%,100%{opacity:.25;transform:scale(.97)}50%{opacity:.9;transform:scale(1.03)}}
+@keyframes tw{0%,100%{opacity:0;transform:scale(.2) rotate(0)}50%{opacity:1;transform:scale(1) rotate(45deg)}}
+@keyframes sw{to{left:115%}}
+@keyframes fin{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<section id="home" class="scr">
+  <img id="logo" src="assets/logo50.webp" alt="ตราสัญลักษณ์ครบรอบ ๕๐ ปี กองบัญชาการควบคุมการปฏิบัติทางอากาศ">
+  <button class="btn" onclick="begin()">เรียนรู้ประวัติผ่านเกม</button>
+</section>
+
+<section id="vid" class="scr" hidden>
+  <video id="v" playsinline controls></video>
+  <p id="vmsg" class="msg" hidden></p>
+  <button class="btn alt" style="margin-top:12px" onclick="next()">ข้าม ›</button>
+</section>
+
+<section id="g1" class="scr" hidden>
+  <div class="g">
+    <h2>เกมที่ ๑: ปลดระเบิดประวัติศาสตร์</h2>
+    <p class="s">คลิกรูปก่อน แล้วค่อยคลิกช่องบนไทม์ไลน์ เรียงจากเก่าไปใหม่</p>
+    <div class="top">
+      <div class="bombwrap"><svg id="bsvg" viewBox="0 0 240 150" role="img" aria-label="ระเบิดเวลา">
+        <path d="M110 72C110 42 82 32 70 12" stroke="#38bdf8" stroke-width="3" fill="none"/><circle cx="70" cy="12" r="4" fill="#38bdf8"/>
+        <path d="M120 72C120 40 120 28 120 8" stroke="#34d399" stroke-width="3" fill="none"/><circle cx="120" cy="8" r="4" fill="#34d399"/>
+        <path d="M130 72C130 42 158 32 172 12" stroke="#facc15" stroke-width="3" fill="none"/><circle cx="172" cy="12" r="4" fill="#facc15"/>
+        <g fill="#b91c1c"><rect x="30" y="48" width="36" height="88" rx="6"/><rect x="102" y="48" width="36" height="88" rx="6"/><rect x="174" y="48" width="36" height="88" rx="6"/></g>
+        <g fill="#7f1d1d"><rect x="30" y="64" width="36" height="8"/><rect x="30" y="112" width="36" height="8"/><rect x="102" y="64" width="36" height="8"/><rect x="102" y="112" width="36" height="8"/><rect x="174" y="64" width="36" height="8"/><rect x="174" y="112" width="36" height="8"/></g>
+        <rect x="18" y="72" width="204" height="48" rx="10" fill="#111827" stroke="#d4af37" stroke-width="2"/>
+        <rect x="32" y="80" width="130" height="32" rx="5" fill="#04140a"/>
+        <text id="bt" x="97" y="105" text-anchor="middle" font-size="26" font-weight="700" font-family="'Chakra Petch',monospace" fill="#ff3b30">00:20</text>
+        <circle class="led" cx="190" cy="96" r="8" fill="#ff3b30"/>
+      </svg></div>
+      <div class="hud" style="justify-content:center"><span id="lives">♥♥♥</span></div>
+      <div class="bar"><div id="fill"></div></div>
+    </div>
+    <div class="tl" id="slots"></div>
+    <div class="ends"><span>เก่าที่สุด</span><span>ใหม่ที่สุด</span></div>
+    <div class="pool" id="pool"></div>
+  </div>
+</section>
+
+<section id="g2" class="scr" hidden>
+  <div class="g">
+    <h2>เกมที่ ๒: GCI สกัดกั้นผู้บุกรุก</h2>
+    <div class="hud"><span id="lvl">ด่านที่ 1 / 5</span><span id="t2">⏱ 5</span></div>
+    <div class="bar"><div id="fill2" style="height:100%;width:100%;background:var(--ok)"></div></div>
+    <canvas id="cv" width="600" height="600"></canvas>
+    <p class="s">ลากเส้นจากเครื่องบินรบ (เขียว) ไปหาศัตรู (แดง) หลบวงของเครื่องบินโดยสาร (ฟ้า)</p>
+    <button class="btn alt" onclick="if(g2.ph==='plan')launch()">ส่งคำสั่งเลย</button>
+  </div>
+</section>
+
+<section id="card" class="scr" hidden>
+  <div class="cbox" id="cbox"><img id="cardimg" alt="ส.ค.ส. ๕๐ ปี คปอ."><div class="sp" id="sp"></div></div>
+  <p id="cardmsg" class="msg" hidden>ยังไม่พบไฟล์ assets/card.jpg</p>
+  <button class="btn" style="margin-top:14px" onclick="goHome()">กลับหน้าแรก</button>
+</section>
+
+<div id="fx" hidden></div>
+<div id="ov" hidden><div class="big" id="ovi"></div><h2 id="ovt"></h2><div id="ovd" hidden></div><p id="ovp"></p><button class="btn" id="ovb" style="margin-top:14px"></button></div>
+
+<script>
+const $ = id => document.getElementById(id);
+const SCR = ['home', 'vid', 'g1', 'g2', 'card'];
+const show = id => { if (id !== 'vid') v.pause(); SCR.forEach(s => $(s).hidden = s !== id); scrollTo(0, 0); };
+
+// เรียงลำดับฉากตรงนี้ (opt = ไม่มีไฟล์ให้ข้ามเอง)
+const FLOW = [
+  { t: 'video', src: 'video1.mp4' }, { t: 'game', id: 1 },
+  { t: 'video', src: 'video2.mp4' }, { t: 'game', id: 2 },
+  { t: 'video', src: 'video3.mp4' },
+  { t: 'video', src: 'greeting.mp4' }, { t: 'card' }
+];
+let step = 0;
+const begin = () => { step = 0; next(); };
+const goHome = () => { step = 0; show('home'); };
+function next() {
+  v.pause();   // กดข้ามแล้วหยุดวิดีโอทันที
+  const f = FLOW[step++];
+  if (!f) return goHome();
+  if (f.t === 'video') playVideo(f);
+  else if (f.t === 'game') f.id === 1 ? startG1() : startG2();
+  else showCard();
+}
+
+// ---------- วิดีโอ (ใช้ตัวเล่นตัวเดียวต่อเนื่อง) ----------
+const v = $('v');
+function playVideo(f) {
+  show('vid'); $('vmsg').hidden = true;
+  v.src = 'assets/' + f.src; v.load(); v.play().catch(() => {});
+}
+v.onended = () => next();
+v.onerror = () => {
+  const f = FLOW[step - 1];
+  if (!f || f.t !== 'video') return;
+  if (f.opt) return next();
+  $('vmsg').textContent = 'ยังไม่พบไฟล์ assets/' + f.src + ' (กด "ข้าม" เพื่อไปต่อ)';
+  $('vmsg').hidden = false;
+};
+
+// ---------- ภาพ ส.ค.ส. ----------
+function sparkle() {
+  const b = $('cbox'); b.classList.remove('go');
+  $('sp').innerHTML = Array.from({ length: 26 }, () => `<i style="--x:${(Math.random() * 112 - 6).toFixed(0)}%;--y:${(Math.random() * 112 - 6).toFixed(0)}%;--s:${(10 + Math.random() * 18).toFixed(0)}px;--d:${(1.8 + Math.random() * 1.8).toFixed(1)}s;--dl:${(1 + Math.random() * 2.6).toFixed(1)}s"></i>`).join('') + '<div class="shw"><div class="sh"></div></div>';
+  void b.offsetWidth; b.classList.add('go');
+}
+function showCard() {
+  show('card'); sparkle(); const i = $('cardimg'); $('cardmsg').hidden = true; let tried = false;
+  i.onerror = () => { if (!tried) { tried = true; i.src = 'assets/card.png'; } else { i.removeAttribute('src'); $('cardmsg').hidden = false; } };
+  i.src = 'assets/card.jpg';
+}
+
+// ---------- เสียงเอฟเฟกต์ ----------
+let ac;
+function beep(f = 880, d = .08, type = 'sine') {
+  try {
+    ac = ac || new AudioContext();
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.type = type; o.frequency.value = f; g.gain.value = .08;
+    o.connect(g); g.connect(ac.destination); o.start(); o.stop(ac.currentTime + d);
+  } catch (e) {}
+}
+
+// ---------- เกมที่ 1: ปลดระเบิด ----------
+const ITEMS = {
+  tac: 'ตรากองบินยุทธการ',
+  khamron: 'พล.อ.อ. คำรณ ลีละสิริ',
+  dept: 'ตรากรมควบคุมการปฏิบัติทางอากาศ',
+  current: 'ตรากองบัญชาการควบคุมการปฏิบัติทางอากาศ',
+  building: 'อาคารกองบัญชาการปัจจุบัน',
+  commander: 'พล.อ.อ. พิชิตไชย สุรกิจพิพัฒน์ (ผบ.คปอ.)'
+};
+const ORDER = ['tac', 'khamron', 'dept', 'building', 'current', 'commander'];
+const TIME = 20, LIVES = 3;
+const COMFORT = [
+  'ไม่เป็นไรนะ ทุกคนพลาดได้ ลองอีกครั้งนะ',
+  'เกือบแล้ว! ประวัติศาสตร์ต้องค่อย ๆ จำ ลองใหม่ได้เลย',
+  'ไม่ต้องกังวล ระเบิดลูกนี้ปลดได้อีกแน่นอน สู้ ๆ'
+];
+const DEMO1 = `<div class="d1"><div class="dl"></div>
+<i class="ds t" style="left:10%"></i><i class="ds" style="left:41.5%"></i><i class="ds" style="left:73%"></i>
+<div class="dc" style="left:12%"><img src="assets/building.webp" alt=""></div>
+<div class="dc a" style="left:41.5%"><img src="assets/tac.webp" alt=""></div>
+<div class="dc" style="left:71%"><img src="assets/current.webp" alt=""></div>
+<div class="fly"><img src="assets/tac.webp" alt=""></div><span class="dh">👆</span></div>
+<div class="dcap"><b class="c1">① คลิก (แตะ) รูปก่อน</b><b class="c2">② แล้วค่อยคลิกช่องบนไทม์ไลน์</b></div>`;
+const DEMO2 = `<svg class="d2" viewBox="0 0 300 200" role="img" aria-label="ตัวอย่างวิธีเล่น">
+<rect width="300" height="200" rx="12" fill="#04140a" stroke="#d4af37"/>
+<g fill="none" stroke="rgba(74,222,128,.25)"><circle cx="150" cy="190" r="60"/><circle cx="150" cy="190" r="120"/><circle cx="150" cy="190" r="180"/></g>
+<circle cx="172" cy="105" r="24" fill="rgba(103,232,249,.14)" stroke="#67e8f9" stroke-width="2"/>
+<polygon points="172,94 177,112 172,108 167,112" fill="#e0f7fa"/>
+<path id="dp" d="M150 178C92 150 98 72 140 34" fill="none" stroke="#fef08a" stroke-width="3" stroke-linecap="round" stroke-dasharray="190" stroke-dashoffset="190">
+<animate attributeName="stroke-dashoffset" values="190;190;0;0" keyTimes="0;.08;.42;1" dur="7s" repeatCount="indefinite"/></path>
+<polygon points="-8,6 9,0 -8,-6" fill="#f87171"><animateMotion dur="7s" repeatCount="indefinite" rotate="auto" keyPoints="0;0;1;1" keyTimes="0;.5;.85;1" calcMode="linear" path="M152 22L141 33"/></polygon>
+<polygon points="-9,7 11,0 -9,-7" fill="#4ade80"><animateMotion dur="7s" repeatCount="indefinite" rotate="auto" keyPoints="0;0;1;1" keyTimes="0;.5;.85;1" calcMode="linear"><mpath href="#dp"/></animateMotion></polygon>
+<circle cx="141" cy="33" r="0" fill="none" stroke="#fef08a" stroke-width="3"><animate attributeName="r" values="0;0;18;18" keyTimes="0;.85;.95;1" dur="7s" repeatCount="indefinite"/><animate attributeName="opacity" values="0;0;1;0" keyTimes="0;.85;.9;1" dur="7s" repeatCount="indefinite"/></circle>
+<text font-size="22" text-anchor="middle" opacity="0">👆<animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;.04;.08;.42;.46;1" dur="7s" repeatCount="indefinite"/><animateMotion dur="7s" repeatCount="indefinite" keyPoints="0;0;1;1" keyTimes="0;.08;.42;1" calcMode="linear"><mpath href="#dp"/></animateMotion></text>
+</svg>
+<div class="dcap"><span>① ลากเส้นจากเครื่องบินรบ (เขียว) ไปหาศัตรู (แดง)</span><span>② เส้นต้องไม่แตะวงเครื่องบินโดยสาร (ฟ้า)</span><span>③ ปล่อยแล้วเครื่องบินจะบินตามเส้น</span></div>`;
+let lives, left, sel, done, timer, over;
+
+const seen = {};   // ตัวอย่างวิธีเล่นแสดงครั้งแรกครั้งเดียว (เล่นซ้ำไม่แสดงอีก)
+function ov(icon, title, text, label, cb, demo = '') {
+  $('ovi').textContent = icon; $('ovi').hidden = !!demo; $('ovt').textContent = title; $('ovp').textContent = text;
+  $('ovd').innerHTML = demo; $('ovd').hidden = !demo;
+  $('ovb').textContent = label; $('ovb').onclick = () => { $('ov').hidden = true; cb(); };
+  $('ov').hidden = false;
+}
+function startG1() {
+  show('g1'); clearInterval(timer);
+  lives = LIVES; left = TIME; sel = null; done = 0; over = false;
+  $('bsvg').classList.remove('safe', 'hot'); $('bsvg').style.visibility = '';
+  $('slots').innerHTML = ORDER.map((_, i) => `<button class="slot" data-i="${i}" onclick="place(${i})">${i + 1}</button>`).join('');
+  let deck;
+  do { deck = [...ORDER].sort(() => Math.random() - .5); } while (deck.every((k, i) => k === ORDER[i]));
+  $('pool').innerHTML = deck.map(k => `<button class="card" data-k="${k}" onclick="pick('${k}')"><img src="assets/${k}.webp" alt=""><span>${ITEMS[k]}</span></button>`).join('');
+  hud();
+  ov('💣', 'ปลดระเบิดภายใน ๒๐ วินาที', 'คลิกรูปก่อน แล้วค่อยคลิกช่องบนไทม์ไลน์ที่เลือก เรียงเหตุการณ์จากเก่าไปใหม่ มี ๓ ชีวิต วางผิดเสียหนึ่งชีวิต', 'เริ่ม!', () => { seen.g1 = true; run(); }, seen.g1 ? '' : DEMO1);
+}
+function run() {
+  timer = setInterval(() => {
+    left = Math.max(0, left - .1); hud();
+    if (Math.abs(left - Math.round(left)) < .05 && left > 0) beep(left <= 3 ? 1200 : 700, .05);
+    if (left <= 0) boom();
+  }, 100);
+}
+function hud() {
+  $('bt').textContent = '00:' + String(Math.ceil(left)).padStart(2, '0');
+  $('bsvg').classList.toggle('hot', left <= 5 && left > 0);
+  $('lives').textContent = '♥'.repeat(lives) + '♡'.repeat(LIVES - lives);
+  const f = $('fill'); f.style.width = (left / TIME * 100) + '%';
+  f.style.background = left <= 3 ? 'var(--red)' : 'var(--ok)';
+}
+function pick(k) {
+  if (over) return; sel = k;
+  document.querySelectorAll('.card').forEach(c => c.classList.toggle('sel', c.dataset.k === k));
+}
+function place(i) {
+  if (over || !sel) return;
+  const slot = document.querySelector(`.slot[data-i="${i}"]`);
+  if (slot.classList.contains('ok')) return;
+  if (ORDER[i] === sel) {
+    slot.innerHTML = `<img src="assets/${sel}.webp" alt="${ITEMS[sel]}">`; slot.classList.add('ok');
+    document.querySelector(`.card[data-k="${sel}"]`).remove(); sel = null; beep(1000, .1);
+    if (++done === ORDER.length) win();
+  } else {
+    lives--; hud(); beep(180, .2, 'square'); slot.classList.remove('bad'); void slot.offsetWidth; slot.classList.add('bad');
+    if (lives <= 0) boom();
+  }
+}
+function win() {
+  over = true; clearInterval(timer); beep(1400, .3);
+  $('bt').textContent = 'SAFE'; $('bsvg').classList.add('safe'); $('bsvg').classList.remove('hot');
+  ov('✅', 'ปลดระเบิดสำเร็จ!', 'เรียงประวัติได้ถูกต้องทั้งหมด', 'ไปต่อ', next);
+}
+function explode() {
+  const fx = $('fx'), n = 18;
+  fx.innerHTML = '<div class="fl"></div><div class="ring"></div>' + Array.from({ length: n }, (_, i) => {
+    const a = i / n * 6.283 + Math.random() * .3, r = 28 + Math.random() * 32;
+    return `<i style="--dx:${(Math.cos(a) * r).toFixed(1)}vmax;--dy:${(Math.sin(a) * r).toFixed(1)}vmax"></i>`;
+  }).join('');
+  fx.hidden = false; $('g1').classList.add('shake'); $('bsvg').style.visibility = 'hidden';
+  setTimeout(() => { fx.hidden = true; fx.innerHTML = ''; $('g1').classList.remove('shake'); }, 1200);
+}
+function boom() {
+  if (over) return; over = true; clearInterval(timer); beep(90, .6, 'sawtooth');
+  $('bt').textContent = '00:00'; explode();
+  setTimeout(() => ov('💥', 'บึ้ม!', COMFORT[Math.floor(Math.random() * COMFORT.length)], 'ลองใหม่', startG1), 1100);
+}
+
+// ---------- เกมที่ 2: GCI ----------
+const W = 600, FS = 190, HIT = 26, ZONE = 34, PLAN = 5, MAXLEN = 1000;   // ปรับความยากได้ที่ค่าเหล่านี้
+// e = [x, y, vx, vy] ศัตรู, p = เครื่องบินโดยสาร [x, y, vx, vy] (พิกเซลและพิกเซล/วินาที)
+const LV = [
+  { e: [150, 110, 32, 26], p: [[480, 300, -34, 0]] },
+  { e: [450, 130, -40, 30], p: [[300, 330, 28, -10]] },
+  { e: [300, 90, 0, 46], p: [[190, 320, 42, 0], [420, 240, -30, 12]] },
+  { e: [110, 150, 52, 22], p: [[300, 390, 0, -32], [250, 230, 36, 6], [460, 330, -30, 0]] },
+  { e: [500, 100, -58, 36], p: [[300, 300, -22, 26], [150, 370, 32, -16], [400, 190, 12, 32], [210, 200, 34, 2]] }
+];
+const g2 = { lv: 0, ph: 'ready' };
+const cv = $('cv'), cx = cv.getContext('2d'), tints = {};
+const PLANE = new Path2D('M0,-16 L3,-4 L16,4 L16,7 L3,4 L2,13 L6,16 L6,18 L0,16.5 L-6,18 L-6,16 L-2,13 L-3,4 L-16,7 L-16,4 L-3,-4 Z');
+function tint(img, c) {
+  const o = document.createElement('canvas'); o.width = img.width; o.height = img.height;
+  const x = o.getContext('2d'); x.drawImage(img, 0, 0);
+  x.globalCompositeOperation = 'source-atop'; x.globalAlpha = .75; x.fillStyle = c; x.fillRect(0, 0, o.width, o.height);
+  return o;
+}
+const FI = new Image();
+FI.onload = () => { tints.g = tint(FI, '#4ade80'); tints.r = tint(FI, '#f87171'); };
+FI.src = 'assets/fighter.webp';
+
+function startG2() { g2.lv = 0; show('g2'); level(); }
+function level() {
+  const d = LV[g2.lv];
+  Object.assign(g2, {
+    ph: 'ready', left: PLAN, path: [], len: 0, endT: 0, done: false,
+    f: { x: 300, y: 540, h: -Math.PI / 2, i: 0 },
+    e: { x: d.e[0], y: d.e[1], vx: d.e[2], vy: d.e[3] },
+    p: d.p.map(a => ({ x: a[0], y: a[1], vx: a[2], vy: a[3] }))
+  });
+  $('lvl').textContent = 'ด่านที่ ' + (g2.lv + 1) + ' / ' + LV.length;
+  cancelAnimationFrame(g2.raf); g2.last = 0; g2.raf = requestAnimationFrame(frame);
+  const first = !seen.g2;
+  ov('📡', first ? 'คุณคือ GCI' : 'ด่านที่ ' + (g2.lv + 1),
+    first ? 'ลากเส้นพาเครื่องบินรบไปชนศัตรู ห้ามแตะวงเครื่องบินโดยสาร มีเวลาลากเส้นด่านละ ๕ วินาที กากบาทเหลืองคือจุดสกัดกั้นโดยประมาณ' : 'ลากเส้นสกัดกั้นให้ทันภายใน ๕ วินาที',
+    'เริ่ม!', () => { seen.g2 = true; g2.ph = 'plan'; }, first ? DEMO2 : '');
+}
+function launch() {
+  if (g2.path.length < 2) return end(false, 'หมดเวลาแล้ว ต้องลากเส้นก่อนครบ ๕ วินาทีนะ ไม่เป็นไร ลองอีกครั้ง');
+  g2.ph = 'fly'; beep(600, .1);
+}
+function end(win, msg) {
+  g2.ph = 'end';
+  if (win) {
+    beep(1300, .3);
+    if (g2.lv < LV.length - 1) ov('🎯', 'สกัดกั้นสำเร็จ!', 'ด่านที่ ' + (g2.lv + 1) + ' ผ่านแล้ว', 'ด่านต่อไป', () => { g2.lv++; level(); });
+    else ov('🎖️', 'ภารกิจสำเร็จ!', 'คุณสกัดกั้นผู้บุกรุกได้ครบทั้ง ๕ ด่าน โดยไม่กระทบเครื่องบินโดยสารเลย', 'ไปต่อ', () => { cancelAnimationFrame(g2.raf); next(); });
+  } else {
+    beep(110, .5, 'sawtooth');
+    ov('💥', 'ภารกิจไม่สำเร็จ', msg, 'ลองด่านนี้ใหม่', level);
+  }
+}
+function frame(ts) {
+  const dt = Math.min(.05, g2.last ? (ts - g2.last) / 1000 : 0); g2.last = ts;
+  if (g2.ph === 'plan') {
+    g2.left -= dt; const l = Math.max(0, g2.left);
+    $('t2').textContent = '⏱ ' + Math.ceil(l); $('fill2').style.width = (l / PLAN * 100) + '%';
+    if (g2.left <= 0) launch();
+  } else if (g2.ph === 'fly') fly(dt);
+  draw(); g2.raf = requestAnimationFrame(frame);
+}
+function fly(dt) {
+  const f = g2.f, P = g2.path; let d = FS * dt;
+  while (d > 0 && f.i < P.length - 1) {
+    const n = P[f.i + 1], dx = n.x - f.x, dy = n.y - f.y, L = Math.hypot(dx, dy);
+    if (L > 0.01) f.h = Math.atan2(dy, dx);
+    if (L <= d) { f.x = n.x; f.y = n.y; d -= L; f.i++; } else { f.x += dx / L * d; f.y += dy / L * d; d = 0; }
+  }
+  for (const o of [g2.e, ...g2.p]) { o.x += o.vx * dt; o.y += o.vy * dt; }
+  for (const p of g2.p) if (Math.hypot(p.x - f.x, p.y - f.y) < ZONE) return end(false, 'เครื่องบินโดยสารต้องปลอดภัยเสมอ ไม่เป็นไรนะ ลองหาเส้นทางใหม่อีกครั้ง');
+  if (Math.hypot(g2.e.x - f.x, g2.e.y - f.y) < HIT) return end(true);
+  if (f.i >= P.length - 1 && (g2.endT += dt) > .5) end(false, 'พลาดเป้าไปนิดเดียว ลองคาดการณ์ทางของศัตรูให้ไกลขึ้นอีกหน่อยนะ');
+}
+// ลากเส้น (ช่วง 5 วินาทีแรก)
+let drawing = false;
+const pt = e => { const r = cv.getBoundingClientRect(); return { x: (e.clientX - r.left) * W / r.width, y: (e.clientY - r.top) * W / r.height }; };
+cv.addEventListener('pointerdown', e => {
+  if (g2.ph !== 'plan') return; drawing = true; cv.setPointerCapture(e.pointerId);
+  g2.path = [{ x: 300, y: 540 }]; g2.len = 0; addPt(pt(e));
+});
+cv.addEventListener('pointermove', e => { if (drawing && g2.ph === 'plan') addPt(pt(e)); });
+cv.addEventListener('pointerup', () => { drawing = false; });
+function addPt(q) {
+  const l = g2.path[g2.path.length - 1], d = Math.hypot(q.x - l.x, q.y - l.y);
+  if (d < 5 || g2.len + d > MAXLEN) return; g2.path.push(q); g2.len += d;
+}
+function icon(o, key, h, size) {
+  cx.save(); cx.translate(o.x, o.y); cx.rotate(h + Math.PI / 2);
+  const t = tints[key];
+  if (t) { const hh = size, ww = size * t.width / t.height; cx.drawImage(t, -ww / 2, -hh / 2, ww, hh); }
+  else { cx.fillStyle = key === 'g' ? '#4ade80' : '#f87171'; cx.beginPath(); cx.moveTo(0, -size / 2); cx.lineTo(size / 3, size / 2); cx.lineTo(-size / 3, size / 2); cx.fill(); }
+  cx.restore();
+}
+function draw() {
+  const c = cx, f = g2.f;
+  c.clearRect(0, 0, W, W); c.fillStyle = '#04140a'; c.fillRect(0, 0, W, W);
+  c.strokeStyle = 'rgba(74,222,128,.25)'; c.lineWidth = 1; c.setLineDash([]);
+  for (let r = 100; r <= 450; r += 100) { c.beginPath(); c.arc(300, 300, r, 0, 7); c.stroke(); }
+  c.beginPath(); c.moveTo(300, 0); c.lineTo(300, W); c.moveTo(0, 300); c.lineTo(W, 300); c.stroke();
+  const a = (performance.now() / 1800) % (2 * Math.PI);
+  for (let k = 0; k < 10; k++) { c.fillStyle = 'rgba(74,222,128,' + (.16 - k * .015) + ')'; c.beginPath(); c.moveTo(300, 300); c.arc(300, 300, 430, a - (k + 1) * .05, a - k * .05); c.fill(); }
+  // เส้นทางที่คาดการณ์
+  c.lineWidth = 1.5; c.setLineDash([6, 6]);
+  for (const o of g2.p) { c.strokeStyle = 'rgba(103,232,249,.6)'; c.beginPath(); c.moveTo(o.x, o.y); c.lineTo(o.x + o.vx * 7, o.y + o.vy * 7); c.stroke(); }
+  c.strokeStyle = 'rgba(248,113,113,.7)'; c.beginPath(); c.moveTo(g2.e.x, g2.e.y); c.lineTo(g2.e.x + g2.e.vx * 7, g2.e.y + g2.e.vy * 7); c.stroke();
+  c.setLineDash([]);
+  // จุดสกัดกั้นโดยประมาณ (ก่อนบิน)
+  if (g2.ph !== 'fly' && g2.ph !== 'end') {
+    const ex = g2.e.x - 300, ey = g2.e.y - 540, v = g2.e, A = v.vx * v.vx + v.vy * v.vy - FS * FS, B = 2 * (ex * v.vx + ey * v.vy), C = ex * ex + ey * ey;
+    const D = B * B - 4 * A * C;
+    if (D >= 0) { const t = (-B - Math.sqrt(D)) / (2 * A), ix = v.x + v.vx * t, iy = v.y + v.vy * t;
+      c.strokeStyle = '#fef08a'; c.lineWidth = 2; c.beginPath(); c.moveTo(ix - 9, iy); c.lineTo(ix + 9, iy); c.moveTo(ix, iy - 9); c.lineTo(ix, iy + 9); c.stroke(); }
+  }
+  // วงปลอดภัย + เครื่องบินโดยสาร
+  for (const p of g2.p) {
+    c.fillStyle = 'rgba(103,232,249,.12)'; c.strokeStyle = '#67e8f9'; c.lineWidth = 2;
+    c.beginPath(); c.arc(p.x, p.y, ZONE, 0, 7); c.fill(); c.stroke();
+    c.save(); c.translate(p.x, p.y); c.rotate(Math.atan2(p.vy, p.vx) + Math.PI / 2); c.fillStyle = '#e0f7fa'; c.fill(PLANE); c.restore();
+  }
+  // เส้นที่ผู้เล่นลาก
+  if (g2.path.length > 1) { c.strokeStyle = '#fef08a'; c.lineWidth = 3; c.beginPath(); g2.path.forEach((q, i) => i ? c.lineTo(q.x, q.y) : c.moveTo(q.x, q.y)); c.stroke(); }
+  icon(g2.e, 'r', Math.atan2(g2.e.vy, g2.e.vx), 44);
+  icon(f, 'g', f.h, 44);
+}
+</script>
+</body>
+</html>
